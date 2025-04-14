@@ -3433,19 +3433,37 @@ td:last-child {
 }
 
 .s-intro__content-btns {
-    --color-btn           : var(--color-text-dark);
-    --color-btn-text      : var(--color-white);
-    --color-btn-hover     : var(--color-1);
-    --color-btn-hover-text: var(--color-white);
-    margin-top            : var(--vspace-2);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 2rem;
 }
 
 .s-intro__content-btns .btn {
-    margin-right: var(--vspace-0_375);
+    flex: 1;
+    min-width: 150px;
+    text-align: center;
+    padding: 1rem 2rem;
 }
 
-.s-intro__content-btns .btn:last-child {
-    margin-right: 0;
+.s-intro__content-btns .btn--primary {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.s-intro__content-btns .btn--stroke {
+    border: 2px solid var(--color-primary);
+    color: var(--color-primary);
+}
+
+@media screen and (max-width: 768px) {
+    .s-intro__content-btns {
+        flex-direction: column;
+    }
+    
+    .s-intro__content-btns .btn {
+        width: 100%;
+    }
 }
 
 .s-intro__content-media {
