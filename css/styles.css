@@ -3408,14 +3408,19 @@ td:last-child {
 .s-intro__content-image {
     flex: 0 0 300px;
     text-align: right;
+    overflow: hidden;
 }
 
 .s-intro__content-image img {
     width: 100%;
     height: auto;
-    border-radius: 50%;
     object-fit: cover;
-    max-width: 300px;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.s-intro__content-image img:hover {
+    transform: scale(1.05);
 }
 
 .s-intro__content-pretitle {
@@ -3437,32 +3442,73 @@ td:last-child {
     flex-wrap: wrap;
     gap: 1rem;
     margin-top: 2rem;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .s-intro__content-btns .btn {
-    flex: 1;
+    flex: 0 1 auto;
     min-width: 150px;
     text-align: center;
     padding: 1rem 2rem;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    font-weight: 600;
 }
 
 .s-intro__content-btns .btn--primary {
-    background-color: var(--color-primary);
+    background-color: #2c3e50;
     color: white;
+    order: 1;
+    border: 2px solid #2c3e50;
+}
+
+.s-intro__content-btns .btn--primary:hover {
+    background-color: #34495e;
+    border-color: #34495e;
+    transform: translateY(-2px);
 }
 
 .s-intro__content-btns .btn--stroke {
-    border: 2px solid var(--color-primary);
-    color: var(--color-primary);
+    border: 2px solid #2c3e50;
+    color: #2c3e50;
+    background-color: transparent;
+    order: 2;
+}
+
+.s-intro__content-btns .btn--stroke:hover {
+    background-color: #2c3e50;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.s-intro__content-btns .btn--stroke:last-child {
+    order: 3;
 }
 
 @media screen and (max-width: 768px) {
     .s-intro__content-btns {
         flex-direction: column;
+        width: 100%;
+        gap: 1rem;
     }
     
     .s-intro__content-btns .btn {
         width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+        padding: 0.875rem 1.5rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .s-intro__content-btns {
+        gap: 0.75rem;
+    }
+    
+    .s-intro__content-btns .btn {
+        font-size: 0.95rem;
     }
 }
 
@@ -3895,17 +3941,15 @@ td:last-child {
     
     .s-intro__content-image {
         order: 1;
-        margin-bottom: 2rem;
-        width: 200px;
-        height: 200px;
+        width: 100%;
+        max-width: 400px;
         margin: 0 auto 2rem;
     }
     
     .s-intro__content-image img {
         width: 100%;
-        height: 100%;
+        height: auto;
         object-fit: cover;
-        border-radius: 50%;
     }
     
     .s-intro__content-btns {
@@ -3937,8 +3981,7 @@ td:last-child {
     }
     
     .s-intro__content-image {
-        width: 150px;
-        height: 150px;
+        max-width: 300px;
     }
     
     .s-intro__content-title {
