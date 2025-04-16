@@ -1,152 +1,168 @@
 /* ===================================================================
- * Hudson 1.0.0 - Main JS
+ * Luther 1.0.0 - Main JS
  *
  * ------------------------------------------------------------------- */
 
-(function(html) {
+(function (html) {
 
-    'use strict';
+    "use strict";
+
+    html.className = html.className.replace(/\bno-js\b/g, '') + ' js ';
 
 
-   /* preloader
-    * -------------------------------------------------- */
-    const ssPreloader = function() {
 
-        const siteBody = document.querySelector('body');
+    /* Animations
+     * -------------------------------------------------- */
+    const tl = anime.timeline({
+        easing: 'easeInOutCubic',
+        duration: 800,
+        autoplay: false
+    })
+        .add({
+            targets: '#loader',
+            opacity: 0,
+            duration: 1000,
+            begin: function (anim) {
+                window.scrollTo(0, 0);
+            }
+        })
+        .add({
+            targets: '#preloader',
+            opacity: 0,
+            complete: function (anim) {
+                document.querySelector("#preloader").style.visibility = "hidden";
+                document.querySelector("#preloader").style.display = "none";
+            }
+        })
+        .add({
+            targets: '.s-header',
+            translateY: [-100, 0],
+            opacity: [0, 1]
+        }, '-=200')
+        .add({
+            targets: ['.s-intro .text-pretitle', '.s-intro .text-huge-title'],
+            translateX: [100, 0],
+            opacity: [0, 1],
+            delay: anime.stagger(400)
+        })
+        .add({
+            targets: '.circles span',
+            keyframes: [
+                { opacity: [0, .3] },
+                { opacity: [.3, .1], delay: anime.stagger(100, { direction: 'reverse' }) }
+            ],
+            delay: anime.stagger(100, { direction: 'reverse' })
+        })
+        .add({
+            targets: '.intro-social li',
+            translateX: [-50, 0],
+            opacity: [0, 1],
+            delay: anime.stagger(100, { direction: 'reverse' })
+        })
+        .add({
+            targets: '.intro-scrolldown',
+            translateY: [100, 0],
+            opacity: [0, 1]
+        }, '-=800');
+
+
+
+    /* Preloader
+     * -------------------------------------------------- */
+    const ssPreloader = function () {
+
         const preloader = document.querySelector('#preloader');
         if (!preloader) return;
 
-        html.classList.add('ss-preload');
-        
-        window.addEventListener('load', function() {
-            html.classList.remove('ss-preload');
-            html.classList.add('ss-loaded');
-            
-            preloader.addEventListener('transitionend', function afterTransition(e) {
-                if (e.target.matches('#preloader'))  {
-                    siteBody.classList.add('ss-show');
-                    e.target.style.display = 'none';
-                    preloader.removeEventListener(e.type, afterTransition);
-                }
+        window.addEventListener('load', function () {
+            document.querySelector('html').classList.remove('ss-preload');
+            document.querySelector('html').classList.add('ss-loaded');
+
+            document.querySelectorAll('.ss-animated').forEach(function (item) {
+                item.classList.remove('ss-animated');
             });
+
+            tl.play();
         });
+
+        // force page scroll position to top at page refresh
+        // window.addEventListener('beforeunload' , function () {
+        //     // window.scrollTo(0, 0);
+        // });
 
     }; // end ssPreloader
 
 
-   /* move header
-    * -------------------------------------------------- */
-    const ssMoveHeader = function () {
+    /* Mobile Menu
+     * ---------------------------------------------------- */
+    const ssMobileMenu = function () {
 
-        const hdr = document.querySelector('.s-header');
-        const hero = document.querySelector('#intro');
-        let triggerHeight;
-
-        if (!(hdr && hero)) return;
-
-        setTimeout(function() {
-            triggerHeight = hero.offsetHeight - 170;
-        }, 300);
-
-        window.addEventListener('scroll', function () {
-
-            let loc = window.scrollY;
-
-            if (loc > triggerHeight) {
-                hdr.classList.add('sticky');
-            } else {
-                hdr.classList.remove('sticky');
-            }
-
-            if (loc > triggerHeight + 20) {
-                hdr.classList.add('offset');
-            } else {
-                hdr.classList.remove('offset');
-            }
-
-            if (loc > triggerHeight + 150) {
-                hdr.classList.add('scrolling');
-            } else {
-                hdr.classList.remove('scrolling');
-            }
-
-        });
-
-    }; // end ssMoveHeader
-
-
-   /* mobile menu
-    * ---------------------------------------------------- */ 
-    const ssMobileMenu = function() {
-
-        const toggleButton = document.querySelector('.s-header__menu-toggle');
-        const mainNavWrap = document.querySelector('.s-header__nav');
-        const siteBody = document.querySelector('body');
+        const toggleButton = document.querySelector('.mobile-menu-toggle');
+        const mainNavWrap = document.querySelector('.main-nav-wrap');
+        const siteBody = document.querySelector("body");
 
         if (!(toggleButton && mainNavWrap)) return;
 
-        toggleButton.addEventListener('click', function(e) {
-            e.preventDefault();
+        toggleButton.addEventListener('click', function (event) {
+            event.preventDefault();
             toggleButton.classList.toggle('is-clicked');
             siteBody.classList.toggle('menu-is-open');
         });
 
-        mainNavWrap.querySelectorAll('.s-header__nav a').forEach(function(link) {
+        mainNavWrap.querySelectorAll('.main-nav a').forEach(function (link) {
+            link.addEventListener("click", function (event) {
 
-            link.addEventListener("click", function(event) {
-
-                // at 900px and below
-                if (window.matchMedia('(max-width: 900px)').matches) {
+                // at 800px and below
+                if (window.matchMedia('(max-width: 800px)').matches) {
                     toggleButton.classList.toggle('is-clicked');
                     siteBody.classList.toggle('menu-is-open');
                 }
             });
         });
 
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', function () {
 
-            // above 900px
-            if (window.matchMedia('(min-width: 901px)').matches) {
+            // above 800px
+            if (window.matchMedia('(min-width: 801px)').matches) {
                 if (siteBody.classList.contains('menu-is-open')) siteBody.classList.remove('menu-is-open');
-                if (toggleButton.classList.contains('is-clicked')) toggleButton.classList.remove('is-clicked');
+                if (toggleButton.classList.contains("is-clicked")) toggleButton.classList.remove("is-clicked");
             }
         });
 
     }; // end ssMobileMenu
 
 
-   /* highlight active menu link on pagescroll
-    * ------------------------------------------------------ */
-    const ssScrollSpy = function() {
+    /* Highlight active menu link on pagescroll
+     * ------------------------------------------------------ */
+    const ssScrollSpy = function () {
 
-        const sections = document.querySelectorAll('.target-section');
-        if (!sections) return;
+        const sections = document.querySelectorAll(".target-section");
 
         // Add an event listener listening for scroll
-        window.addEventListener('scroll', navHighlight);
+        window.addEventListener("scroll", navHighlight);
 
         function navHighlight() {
-        
+
             // Get current scroll position
             let scrollY = window.pageYOffset;
-        
+
             // Loop through sections to get height(including padding and border), 
             // top and ID values for each
-            sections.forEach(function(current) {
+            sections.forEach(function (current) {
                 const sectionHeight = current.offsetHeight;
                 const sectionTop = current.offsetTop - 50;
-                const sectionId = current.getAttribute('id');
-            
-               /* If our current scroll position enters the space where current section 
-                * on screen is, add .current class to parent element(li) of the thecorresponding 
-                * navigation link, else remove it. To know which link is active, we use 
-                * sectionId variable we are getting while looping through sections as 
-                * an selector
-                */
+                const sectionId = current.getAttribute("id");
+
+                /* If our current scroll position enters the space where current section 
+                 * on screen is, add .current class to parent element(li) of the thecorresponding 
+                 * navigation link, else remove it. To know which link is active, we use 
+                 * sectionId variable we are getting while looping through sections as 
+                 * an selector
+                 */
                 if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-                    document.querySelector('.s-header__nav a[href*=' + sectionId + ']').parentNode.classList.add('current');
+                    document.querySelector(".main-nav a[href*=" + sectionId + "]").parentNode.classList.add("current");
                 } else {
-                    document.querySelector('.s-header__nav a[href*=' + sectionId + ']').parentNode.classList.remove('current');
+                    document.querySelector(".main-nav a[href*=" + sectionId + "]").parentNode.classList.remove("current");
                 }
             });
         }
@@ -154,31 +170,51 @@
     }; // end ssScrollSpy
 
 
-   /* glightbox
-    * ------------------------------------------------------ */ 
-    const ssGLightbox = function() {
+    /* Animate elements if in viewport
+     * ------------------------------------------------------ */
+    const ssViewAnimate = function () {
 
-        const lightbox = GLightbox({
-            selector: '.glightbox',
-            zoomable: false,
-            touchNavigation: true,
-            loop: false,
-            autoplayVideos: true,
-            svg: {
-                close: '<svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m12 10.93 5.719-5.72c.146-.146.339-.219.531-.219.404 0 .75.324.75.749 0 .193-.073.385-.219.532l-5.72 5.719 5.719 5.719c.147.147.22.339.22.531 0 .427-.349.75-.75.75-.192 0-.385-.073-.531-.219l-5.719-5.719-5.719 5.719c-.146.146-.339.219-.531.219-.401 0-.75-.323-.75-.75 0-.192.073-.384.22-.531l5.719-5.719-5.72-5.719c-.146-.147-.219-.339-.219-.532 0-.425.346-.749.75-.749.192 0 .385.073.531.219z"/></svg>',
-                prev: '<svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m9.474 5.209s-4.501 4.505-6.254 6.259c-.147.146-.22.338-.22.53s.073.384.22.53c1.752 1.754 6.252 6.257 6.252 6.257.145.145.336.217.527.217.191-.001.383-.074.53-.221.293-.293.294-.766.004-1.057l-4.976-4.976h14.692c.414 0 .75-.336.75-.75s-.336-.75-.75-.75h-14.692l4.978-4.979c.289-.289.287-.761-.006-1.054-.147-.147-.339-.221-.53-.221-.191-.001-.38.071-.525.215z" fill-rule="nonzero"/></svg>',
-                next: '<svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m14.523 18.787s4.501-4.505 6.255-6.26c.146-.146.219-.338.219-.53s-.073-.383-.219-.53c-1.753-1.754-6.255-6.258-6.255-6.258-.144-.145-.334-.217-.524-.217-.193 0-.385.074-.532.221-.293.292-.295.766-.004 1.056l4.978 4.978h-14.692c-.414 0-.75.336-.75.75s.336.75.75.75h14.692l-4.979 4.979c-.289.289-.286.762.006 1.054.148.148.341.222.533.222.19 0 .378-.072.522-.215z" fill-rule="nonzero"/></svg>'
-            }
-        });        
+        const blocks = document.querySelectorAll("[data-animate-block]");
 
-    } // end ssGLightbox
+        window.addEventListener("scroll", viewportAnimation);
+
+        function viewportAnimation() {
+
+            let scrollY = window.pageYOffset;
+
+            blocks.forEach(function (current) {
+
+                const viewportHeight = window.innerHeight;
+                const triggerTop = (current.offsetTop + (viewportHeight * .2)) - viewportHeight;
+                const blockHeight = current.offsetHeight;
+                const blockSpace = triggerTop + blockHeight;
+                const inView = scrollY > triggerTop && scrollY <= blockSpace;
+                const isAnimated = current.classList.contains("ss-animated");
+
+                if (inView && (!isAnimated)) {
+                    anime({
+                        targets: current.querySelectorAll("[data-animate-el]"),
+                        opacity: [0, 1],
+                        translateY: [100, 0],
+                        delay: anime.stagger(400, { start: 200 }),
+                        duration: 800,
+                        easing: 'easeInOutCubic',
+                        begin: function (anim) {
+                            current.classList.add("ss-animated");
+                        }
+                    });
+                }
+            });
+        }
+
+    }; // end ssViewAnimate
 
 
-   /* swiper
-    * ------------------------------------------------------ */ 
-    const ssSwiper = function() {
+    /* Swiper
+     * ------------------------------------------------------ */
+    const ssSwiper = function () {
 
-        const testimonialsSwiper = new Swiper('.s-testimonials__slider', {
+        const mySwiper = new Swiper('.swiper-container', {
 
             slidesPerView: 1,
             pagination: {
@@ -194,12 +230,12 @@
                 // when window width is > 800px
                 801: {
                     slidesPerView: 2,
-                    spaceBetween: 50
+                    spaceBetween: 32
                 },
-                // when window width is > 1180px
-                1181: {
-                    slidesPerView: 3,
-                    spaceBetween: 48
+                // when window width is > 1200px
+                1201: {
+                    slidesPerView: 2,
+                    spaceBetween: 80
                 }
             }
         });
@@ -207,55 +243,69 @@
     }; // end ssSwiper
 
 
-   /* alert boxes
-    * ------------------------------------------------------ */
-    const ssAlertBoxes = function() {
+    /* Lightbox
+     * ------------------------------------------------------ */
+    const ssLightbox = function () {
+
+        const folioLinks = document.querySelectorAll('.folio-list__item-link');
+        const modals = [];
+
+        folioLinks.forEach(function (link) {
+            let modalbox = link.getAttribute('href');
+            let instance = basicLightbox.create(
+                document.querySelector(modalbox),
+                {
+                    onShow: function (instance) {
+                        //detect Escape key press
+                        document.addEventListener("keydown", function (event) {
+                            event = event || window.event;
+                            if (event.keyCode === 27) {
+                                instance.close();
+                            }
+                        });
+                    }
+                }
+            )
+            modals.push(instance);
+        });
+
+        folioLinks.forEach(function (link, index) {
+            link.addEventListener("click", function (event) {
+                event.preventDefault();
+                modals[index].show();
+            });
+        });
+
+    };  // end ssLightbox
+
+
+    /* Alert boxes
+     * ------------------------------------------------------ */
+    const ssAlertBoxes = function () {
 
         const boxes = document.querySelectorAll('.alert-box');
-  
-        boxes.forEach(function(box){
 
-            box.addEventListener('click', function(e) {
-                if (e.target.matches('.alert-box__close')) {
-                    e.stopPropagation();
-                    e.target.parentElement.classList.add('hideit');
+        boxes.forEach(function (box) {
 
-                    setTimeout(function() {
-                        box.style.display = 'none';
+            box.addEventListener('click', function (event) {
+                if (event.target.matches(".alert-box__close")) {
+                    event.stopPropagation();
+                    event.target.parentElement.classList.add("hideit");
+
+                    setTimeout(function () {
+                        box.style.display = "none";
                     }, 500)
                 }
             });
+
         })
 
     }; // end ssAlertBoxes
 
 
-    /* Back to Top
-    * ------------------------------------------------------ */
-    const ssBackToTop = function() {
-
-        const pxShow = 900;
-        const goTopButton = document.querySelector(".ss-go-top");
-
-        if (!goTopButton) return;
-
-        // Show or hide the button
-        if (window.scrollY >= pxShow) goTopButton.classList.add("link-is-visible");
-
-        window.addEventListener('scroll', function() {
-            if (window.scrollY >= pxShow) {
-                if(!goTopButton.classList.contains('link-is-visible')) goTopButton.classList.add("link-is-visible")
-            } else {
-                goTopButton.classList.remove("link-is-visible")
-            }
-        });
-
-    }; // end ssBackToTop
-
-
-   /* smoothscroll
-    * ------------------------------------------------------ */
-    const ssMoveTo = function() {
+    /* Smoothscroll
+     * ------------------------------------------------------ */
+    const ssMoveTo = function () {
 
         const easeFunctions = {
             easeInQuad: function (t, b, c, d) {
@@ -264,24 +314,120 @@
             },
             easeOutQuad: function (t, b, c, d) {
                 t /= d;
-                return -c * t* (t - 2) + b;
+                return -c * t * (t - 2) + b;
             },
             easeInOutQuad: function (t, b, c, d) {
-                t /= d/2;
-                if (t < 1) return c/2*t*t + b;
+                t /= d / 2;
+                if (t < 1) return c / 2 * t * t + b;
                 t--;
-                return -c/2 * (t*(t-2) - 1) + b;
+                return -c / 2 * (t * (t - 2) - 1) + b;
             },
             easeInOutCubic: function (t, b, c, d) {
-                t /= d/2;
-                if (t < 1) return c/2*t*t*t + b;
+                t /= d / 2;
+                if (t < 1) return c / 2 * t * t * t + b;
                 t -= 2;
-                return c/2*(t*t*t + 2) + b;
+                return c / 2 * (t * t * t + 2) + b;
             }
         }
 
+
+        // Add this to your JavaScript file
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set up intersection observer for animation
+            const animateBlocks = document.querySelectorAll('[data-animate-block]');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // When the block is visible, animate all items inside with staggered delay
+                        const skillItems = entry.target.querySelectorAll('.skill-item');
+
+                        skillItems.forEach((item, index) => {
+                            // Add delay based on index for staggered effect
+                            setTimeout(() => {
+                                item.classList.add('is-animated');
+
+                                // Animate the icon with additional delay
+                                const icon = item.querySelector('.skill-icon');
+                                if (icon) {
+                                    setTimeout(() => {
+                                        icon.classList.add('is-animated');
+                                    }, 200);
+                                }
+
+                                // Animate the name with additional delay
+                                const name = item.querySelector('.skill-name');
+                                if (name) {
+                                    setTimeout(() => {
+                                        name.classList.add('is-animated');
+                                    }, 300);
+                                }
+                            }, index * 100); // Stagger items by 100ms
+                        });
+
+                        // Unobserve after animation is triggered
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.2 // Trigger when 20% of the element is visible
+            });
+
+            // Observe all animate blocks
+            animateBlocks.forEach(block => {
+                observer.observe(block);
+            });
+
+            // Also handle individual animate elements
+            const animateElements = document.querySelectorAll('[data-animate-el]');
+
+            const elementObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-animated');
+                        elementObserver.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.2
+            });
+
+            animateElements.forEach(el => {
+                elementObserver.observe(el);
+            });
+        });
+        // Add this JavaScript code to make animations trigger when scrolling to the section
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get the skills section
+            const skillsSection = document.getElementById('skills');
+
+            // Set up intersection observer for the skills section
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // When the section comes into view, add a class to trigger animations
+                        skillsSection.classList.add('in-view');
+
+                        // Only trigger once
+                        sectionObserver.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.2 // Trigger when 20% of the section is visible
+            });
+
+            // Start observing the skills section
+            sectionObserver.observe(skillsSection);
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            // Make sure the animation is triggered when the page loads
+            const roleWords = document.querySelectorAll('.role-word');
+            roleWords.forEach(word => {
+                word.style.animationPlayState = 'running';
+            });
+        });
         const triggers = document.querySelectorAll('.smoothscroll');
-        
+
         const moveTo = new MoveTo({
             tolerance: 0,
             duration: 1200,
@@ -289,68 +435,26 @@
             container: window
         }, easeFunctions);
 
-        triggers.forEach(function(trigger) {
+        triggers.forEach(function (trigger) {
             moveTo.registerTrigger(trigger);
         });
 
     }; // end ssMoveTo
 
 
-   /* Initialize
-    * ------------------------------------------------------ */
+    /* Initialize
+     * ------------------------------------------------------ */
     (function ssInit() {
 
         ssPreloader();
-        ssMoveHeader();
         ssMobileMenu();
         ssScrollSpy();
-        ssGLightbox();
+        ssViewAnimate();
         ssSwiper();
+        ssLightbox();
         ssAlertBoxes();
         ssMoveTo();
 
     })();
-
-    // Modal functionality
-    const modalTriggers = document.querySelectorAll('[data-modal-trigger]');
-    const modalCloseButtons = document.querySelectorAll('.modal-popup__close');
-
-    modalTriggers.forEach(trigger => {
-        trigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            const modalId = trigger.getAttribute('href');
-            const modal = document.querySelector(modalId);
-            modal.classList.add('is-visible');
-            document.body.style.overflow = 'hidden';
-        });
-    });
-
-    modalCloseButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            const modal = button.closest('.modal-popup');
-            modal.classList.remove('is-visible');
-            document.body.style.overflow = '';
-        });
-    });
-
-    // Close modal when clicking outside
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal-popup')) {
-            e.target.classList.remove('is-visible');
-            document.body.style.overflow = '';
-        }
-    });
-
-    // Close modal with Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            const visibleModal = document.querySelector('.modal-popup.is-visible');
-            if (visibleModal) {
-                visibleModal.classList.remove('is-visible');
-                document.body.style.overflow = '';
-            }
-        }
-    });
 
 })(document.documentElement);

@@ -1,21 +1,17 @@
 {
-  "name": "portfolio",
+  "name": "my-website",
   "version": "1.0.0",
-  "description": "",
+  "description": "My Portfolio",
   "main": "index.js",
   "scripts": {
-    "dev": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/anassanderwale/Portfolio.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/anassanderwale/Portfolio/issues"
-  },
-  "homepage": "https://github.com/anassanderwale/Portfolio#readme"
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.3"
+  }
 }
